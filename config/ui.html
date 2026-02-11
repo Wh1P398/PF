@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+    h2 {
+      margin-bottom: 12px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    p {
+      margin-bottom: 16px;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 16px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px dashed rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    input[type="file"]::file-selector-button {
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      flex: 1;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    #gen {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    #cancel {
+      background: rgba(220, 53, 69, 0.9);
+      color: white;
+    }
+    .emoji {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="emoji">🎥✨</div>
+  <h2>Генератор презентации</h2>
+  <p>Загрузите JSON с категориями устройств</p>
+  <input type="file" id="file" accept=".json" />
+  <div class="buttons">
+    <button id="gen">🚀 Сгенерировать</button>
+    <button id="cancel">✕ Отмена</button>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    
+    document.getElementById('gen').onclick = () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('⚠️ Выберите JSON-файл');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!Array.isArray(data)) {
+            throw new Error('JSON должен содержать массив категорий');
+          }
+          parent.postMessage({ pluginMessage: { type: 'generate', data } }, '*');
+        } catch (err) {
+          alert('❌ Ошибка в JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    document.getElementById('cancel').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
+    };
+  </script>
+</body>
+</html>
+
